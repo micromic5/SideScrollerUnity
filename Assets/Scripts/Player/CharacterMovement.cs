@@ -4,8 +4,9 @@ using UnityEngine;
 
 public class CharacterMovement : MonoBehaviour
 {
+    private const float gravityValue = -9.81f;
     private CharacterController controller;
-    private Vector3 playerVelocity;
+    private Vector3 playerVelocity = new Vector3();
     private bool groundedPlayer;
     [SerializeField]
     private float playerWalkSpeed = 5.0f;
@@ -13,22 +14,39 @@ public class CharacterMovement : MonoBehaviour
     private float playerRunnSpeed = 10.0f;
     [SerializeField]
     private float jumpHeight = 1.0f;
-    private const float gravityValue = -9.81f;
 
     void Start()
     {
-       controller = gameObject.GetComponent<CharacterController>();
+        controller = gameObject.GetComponent<CharacterController>();
     }
 
     void Update()
     {
-
         groundedPlayer = controller.isGrounded;
-        StopFall();
-        Movement();
+        ResetPlayerVelocityY();
+        Jump();
+        Vector3 move = Move();
+        ApplyGravity();
+        RotateIntoMoveDirection(move);
     }
 
-    private void StopFall()
+    private Vector3 Move()
+    {
+        float playerSpeed = (Input.GetButton("Run") ? playerRunnSpeed : playerWalkSpeed);
+        Vector3 move = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
+        controller.Move((move * playerSpeed + playerVelocity) * Time.deltaTime);
+        return move;
+    }
+
+    private void Jump()
+    {
+        if (Input.GetButton("Jump") && groundedPlayer)
+        {
+            playerVelocity.y += jumpHeight * -1f * gravityValue;
+        }
+    }
+
+    private void ResetPlayerVelocityY()
     {
         if (groundedPlayer && playerVelocity.y < 0)
         {
@@ -36,26 +54,17 @@ public class CharacterMovement : MonoBehaviour
         }
     }
 
-    private void Movement()
+    private void ApplyGravity()
     {
-        // x and z axis movement
-        float playerSpeed = (Input.GetButton("Run") ? playerRunnSpeed : playerWalkSpeed);
-        Vector3 move = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
-
-        // y axis movement
-        if (Input.GetButton("Jump") && groundedPlayer)
-        {
-            playerVelocity.y += Mathf.Sqrt(jumpHeight * -3.0f * gravityValue);
-        }
         playerVelocity.y += gravityValue * Time.deltaTime;
 
-        controller.Move((move * playerSpeed + playerVelocity) * Time.deltaTime);
-
-        // Object Rotation by changing the forward vector
-        if (move != Vector3.zero)
-        {
-            gameObject.transform.forward = move;
-        }
     }
 
+    private void RotateIntoMoveDirection(Vector3 moveDirection)
+    {
+        if (moveDirection != Vector3.zero)
+        {
+            gameObject.transform.forward = moveDirection;
+        }
+    }
 }
