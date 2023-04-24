@@ -11,28 +11,37 @@ public class PlaceStairs : MonoBehaviour
 
     void Start()
     {
-        for (int i = 0; i < 5; i++)
-        {
-            GameObject spawnedObject = ObjectPool.SharedInstance.pooledObjects.Get();
-            placedPrefabs.Add(spawnedObject);
-        }
     }
+
+
 
     void Update()
     {
-        /*if (!Input.GetButton("PlaceObject"))
+        /* PERFORMANCE DEMO, EACH FRAME A STAIR IS SPAWNED
+         * 
+        if (!Input.GetButton("PlaceObject"))
         {
             Instantiate(prefab, transform.position + transform.forward * distanceToPlayer, Quaternion.identity);
         }*/
-        /*if (Input.GetButtonDown("PlaceObject"))
+
+        /* INSTANTIACTE DEMO
+         * 
+        if (Input.GetButtonDown("PlaceObject"))
         {
             placedPrefabs.Add(Instantiate(prefab, transform.position + transform.forward * distanceToPlayer, Quaternion.identity));
-        }
+        }*/
+
+        /* DESTROY DEMO
+         * 
         if (Input.GetButtonDown("DestroyObject") && placedPrefabs.Count != 0)
         {
             Destroy(placedPrefabs[placedPrefabs.Count - 1]);
             placedPrefabs.RemoveAt(placedPrefabs.Count - 1);
         }*/
+
+        /*
+         * OBJECT POOL DEMO
+         */
         if (Input.GetButtonDown("PlaceObject"))
         {
 
@@ -40,7 +49,9 @@ public class PlaceStairs : MonoBehaviour
             spawnedObject.transform.position = transform.position + transform.forward * distanceToPlayer;
             spawnedObject.transform.rotation = Quaternion.identity;
             placedPrefabs.Add(spawnedObject);
-            /*GameObject objectToSpawn = ObjectPooling.SharedInstance.GetPooledObject();
+            /* OBJECT POOL WITHOUT OBJECTPOOL<> CLASS
+             * 
+            GameObject objectToSpawn = ObjectPooling.SharedInstance.GetPooledObject();
             if (objectToSpawn != null)
             {
                 objectToSpawn.transform.position = transform.position + transform.forward * distanceToPlayer;
@@ -55,8 +66,11 @@ public class PlaceStairs : MonoBehaviour
                 ObjectPool.SharedInstance.pooledObjects.Release(placedPrefabs[placedPrefabs.Count - 1]);
                 placedPrefabs.RemoveAt(placedPrefabs.Count - 1);
             }
-            
-            //ObjectPooling.SharedInstance.RemovePooledObject();
+
+            /* OBJECT POOL WITHOUT OBJECTPOOL<> CLASS
+             * 
+             ObjectPooling.SharedInstance.RemovePooledObject();
+            */
         }
     }
 }

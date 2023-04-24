@@ -16,13 +16,28 @@ public class ObjectPool : MonoBehaviour
     void Awake()
     {
         SharedInstance = this;
-    }
-
-    void Start()
-    {
         pooledObjects = new ObjectPool<GameObject>(CreatePooledItem, OnTakeFromPool, OnReturnedToPool, OnDestroyPoolObject, collectionChecks, amountToPool, maxPool);
     }
-    
+
+    private void Start()
+    {
+        PreSpawnObjects();
+    }
+
+    private void PreSpawnObjects()
+    {
+        List<GameObject> preSpawnedObjects = new List<GameObject>();
+        for (int i = 0; i < amountToPool; i++)
+        {
+            GameObject spawnedObject = ObjectPool.SharedInstance.pooledObjects.Get();
+            preSpawnedObjects.Add(spawnedObject);
+        }
+        foreach (GameObject preSpawned in preSpawnedObjects)
+        {
+            ObjectPool.SharedInstance.pooledObjects.Release(preSpawned);
+        }
+    }
+
     private GameObject CreatePooledItem()
     {
         return Instantiate(objectToPool); 
